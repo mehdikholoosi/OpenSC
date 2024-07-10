@@ -11,58 +11,28 @@ on:
 
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze pkcs15-authentic.c
     runs-on: ubuntu-latest
-
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Check if file exists
-      run: |
-        if [ ! -f "src/pkcs15init/pkcs15-authentic.c" ]; then
-          echo "Error: File 'src/pkcs15init/pkcs15-authentic.c' not found."
-          exit 1
-        fi
-
-    - name: Check if custom query exists
-      id: check_custom_query
-      run: |
-        if [ ! -f "codeql/custom-queries/cpp/use_after_free.ql" ]; then
-          echo "Error: Custom query 'use_after_free.ql' not found."
-          exit 1
-        fi
-
-    - name: Handle missing custom query
-      if: steps.check_custom_query.outcome != 'success'
-      run: |
-        echo "Custom query 'use_after_free.ql' not found. Skipping CodeQL analysis."
-        exit 1
-
     - name: Set up build tools
-      if: steps.check_custom_query.outcome == 'success'
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential cmake
 
     - name: Initialize CodeQL
-      if: steps.check_custom_query.outcome == 'success'
       uses: github/codeql-action/init@v2
       with:
         languages: cpp
 
     - name: Autobuild
-      if: steps.check_custom_query.outcome == 'success'
       uses: github/codeql-action/autobuild@v2
 
     - name: Perform CodeQL Analysis
-      if: steps.check_custom_query.outcome == 'success'
       uses: github/codeql-action/analyze@v2
       with:
-        queries: ./codeql/custom-queries
+        queries: ./codeql
         search-path: src/pkcs15init/pkcs15-authentic.c
