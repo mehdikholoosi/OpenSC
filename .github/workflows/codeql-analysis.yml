@@ -18,22 +18,21 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up build tools
+    - name: Set up build tools and dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake
+        sudo apt-get install -y build-essential cmake libpcsclite-dev
+        # Install other necessary packages as indicated by configure errors
+
+    - name: Configure and Build
+      run: |
+        ./configure --enable-cvcdir=DIR --enable-x509dir=DIR --enable-pcsc
+        make
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: cpp
-
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
-
-    - name: Check Autobuild status
-      if: ${{ failure() }}
-      run: echo "Autobuild failed. Check logs for details." && exit 1
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
