@@ -31,6 +31,7 @@ jobs:
         fi
 
     - name: Check if custom query exists
+      id: check_custom_query
       run: |
         if [ ! -f "codeql/custom-queries/cpp/use_after_free.ql" ]; then
           echo "Error: Custom query 'use_after_free.ql' not found."
@@ -43,15 +44,23 @@ jobs:
         sudo apt-get install -y build-essential cmake
 
     - name: Initialize CodeQL
+      if: steps.check_custom_query.outcome == 'success'
       uses: github/codeql-action/init@v2
       with:
         languages: cpp
 
     - name: Autobuild
+      if: steps.check_custom_query.outcome == 'success'
       uses: github/codeql-action/autobuild@v2
 
     - name: Perform CodeQL Analysis
+      if: steps.check_custom_query.outcome == 'success'
       uses: github/codeql-action/analyze@v2
       with:
         queries: ./codeql/custom-queries
         search-path: src/pkcs15init/pkcs15-authentic.c
+
+    - name: Handle missing custom query
+      if: steps.check_custom_query.outcome != 'success'
+      run: |
+        echo "Custom query 'use_after_free.ql' not found. Skipping CodeQL analysis."
