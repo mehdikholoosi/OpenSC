@@ -19,13 +19,16 @@ jobs:
       contents: read
       security-events: write
 
-    strategy:
-      matrix:
-        language: [ 'cpp' ]
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+
+    - name: Check if file exists
+      run: |
+        if [ ! -f "src/pkcs15init/pkcs15-authentic.c" ]; then
+          echo "Error: File 'src/pkcs15init/pkcs15-authentic.c' not found."
+          exit 1
+        fi
 
     - name: Set up build tools
       run: |
@@ -35,7 +38,7 @@ jobs:
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
       with:
-        languages: ${{ matrix.language }}
+        languages: cpp
 
     - name: Autobuild
       uses: github/codeql-action/autobuild@v2
@@ -44,5 +47,4 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         queries: ./codeql/custom-queries
-        paths: |
-          src/pkcs15init/pkcs15-authentic.c
+        paths: src/pkcs15init/pkcs15-authentic.c
