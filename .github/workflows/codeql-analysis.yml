@@ -29,7 +29,11 @@ jobs:
         languages: cpp
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+      uses: github/codeql-action/autobuild@v3
+
+    - name: Check Autobuild status
+      if: ${{ failure() }}
+      run: echo "Autobuild failed. Check logs for details." && exit 1
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
