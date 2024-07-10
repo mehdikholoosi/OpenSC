@@ -38,7 +38,14 @@ jobs:
           exit 1
         fi
 
+    - name: Handle missing custom query
+      if: steps.check_custom_query.outcome != 'success'
+      run: |
+        echo "Custom query 'use_after_free.ql' not found. Skipping CodeQL analysis."
+        exit 1
+
     - name: Set up build tools
+      if: steps.check_custom_query.outcome == 'success'
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential cmake
@@ -59,8 +66,3 @@ jobs:
       with:
         queries: ./codeql/custom-queries
         search-path: src/pkcs15init/pkcs15-authentic.c
-
-    - name: Handle missing custom query
-      if: steps.check_custom_query.outcome != 'success'
-      run: |
-        echo "Custom query 'use_after_free.ql' not found. Skipping CodeQL analysis."
