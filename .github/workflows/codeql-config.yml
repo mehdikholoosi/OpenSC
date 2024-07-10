@@ -1,0 +1,8 @@
+name: "Custom CodeQL configuration"
+paths:
+  include:
+    - src/pkcs15init/pkcs15-authentic.c
+  exclude:
+    - test/
+    - docs/
+    - scripts/
