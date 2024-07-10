@@ -30,6 +30,13 @@ jobs:
           exit 1
         fi
 
+    - name: Check if custom query exists
+      run: |
+        if [ ! -f "codeql/custom-queries/cpp/use_after_free.ql" ]; then
+          echo "Error: Custom query 'use_after_free.ql' not found."
+          exit 1
+        fi
+
     - name: Set up build tools
       run: |
         sudo apt-get update
@@ -47,4 +54,4 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         queries: ./codeql/custom-queries
-        paths: src/pkcs15init/pkcs15-authentic.c
+        search-path: src/pkcs15init/pkcs15-authentic.c
