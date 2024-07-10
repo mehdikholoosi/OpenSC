@@ -43,5 +43,5 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         # Include custom queries
-        queries: ./codeql
+        queries: .
 
